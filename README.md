@@ -1,10 +1,14 @@
 # Simple Batch Breakpoint generator python
-This notebook script will easy generate responsive image for Frontend website, maintain aspect ratio, no stretch. Normally I have to generate it via https://www.responsivebreakpoints.com/ which quite slow for file by file. So I create some Vue component with fixed Breakpoint size [200,763,1132,1400] in other site production (not in this project) feel free to modify the code
+
+This jupyter notebook script will generate responsive image for lazy-srcset website, maintain aspect ratio, no stretch. Normally I have to generate it via https://www.responsivebreakpoints.com/ or photoscape which abit slow.
+
+## Story and explaination
+I've a create Vue very-lazy and simple-to-use src set component. the property are similar to <img> and don't need to worry about other property and that component included fixed Breakpoint size [200,763,1132,1400] in other website in production (not in this project) It's work perfectly with this script.
 
 # How to use? 
-Specify the folder path that have all the image (right now is all .jpg) and breakpoint width and run script and done.
+Specify the folder path that have all the image (recursive) and breakpoint width in list and run the script.
 
 # Input 
-Sample.jpg 
+Sample.jpg  breakspoints = [200,763,1132,1400]
 # Output
 Sample_200.jpg, Sample_763.jpg, Sample_1132.jpg, Sample_1400.jpg
