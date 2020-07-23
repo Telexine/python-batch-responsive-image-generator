@@ -1,3 +1,5 @@
+![png](output_16_1.png)
+
 # Simple Batch Breakpoint generator python
 
 This jupyter notebook script will generate responsive image for lazy-srcset website, maintain aspect ratio, no stretch. Normally I have to generate it via https://www.responsivebreakpoints.com/ or photoscape which a bit slow.
