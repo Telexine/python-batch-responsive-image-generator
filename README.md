@@ -15,7 +15,7 @@ Specify the folder path that have all the image (recursive) and breakpoint width
 
 ```python
 import os, sys
-from PIL import Image
+from PIL import Image, ImageFilter
 import math 
 import glob 
 ```
@@ -35,10 +35,13 @@ def resize_maintain_aspect_by_width(PIL_Image,new_width):
     
     new_height = math.floor(new_width * height / width )
     return PIL_Image.resize((new_width, new_height), Image.ANTIALIAS)
-```
 
+def apply_GaussianBlur(image,radius=20):
+    '''
+    Apply GaussianBlur with default rad = 10 to image
+    '''
+    return image.filter(ImageFilter.GaussianBlur(radius=radius))
 
-```python
 def savebreakpoint(filename,PIL_Image,breakpoint,formatter="%s_%s"):
     '''
     This function save PIL image by add postfix from specify breakpoint
@@ -46,6 +49,19 @@ def savebreakpoint(filename,PIL_Image,breakpoint,formatter="%s_%s"):
     path = filename.rsplit('.', 1)
     path[0] = formatter % (path[0] , breakpoint)
     PIL_Image.save(r'.'.join(path))
+    
+def generate_image_breakpoints(index,file_path,image,formatter,breakpoint,blur=True):
+    '''
+    This is function helper for generate breakpoints.
+    '''
+    # if it's a lowest-resolution image and generate a lazyload blurred image
+    if(index==0 and blur== True):
+        tmp = resize_maintain_aspect_by_width(image,breakpoint)
+        tmp = apply_GaussianBlur(tmp)
+        savebreakpoint(file_path,tmp,"blur",formatter)
+        
+    tmp = resize_maintain_aspect_by_width(image,breakpoint)
+    savebreakpoint(file_path,tmp,breakpoint,formatter) 
 ```
 
 ## Config
@@ -71,9 +87,8 @@ formatter="%s_%s"
 ```python
 for file in files:
     im = Image.open(file) 
-    for breakpoint in breakpoints:
-        tmp = resize_maintain_aspect_by_width(im,breakpoint)
-        savebreakpoint(file,tmp,breakpoint,formatter) 
+    for index,breakpoint in enumerate(breakpoints):
+        generate_image_breakpoints(index,file,im,formatter,breakpoint,blur=True)
 ```
 
 ### Output: Sample.jpg to Sample_200.jpg, Sample_763.jpg, Sample_1132.jpg, Sample_1400.jpg
@@ -89,7 +104,7 @@ from matplotlib import pyplot as plt
 
 def _plot(_type,fp):
     tmp = Image.open(fp)
-    plt.xlabel( "{0} : Size In Bytes:- {1:20,} kB".format( _type,len(tmp.fp.read()) ))
+    plt.xlabel( "{0} : Size {1:0,.2f} kB".format( _type,len(tmp.fp.read())/1000 ))
     plt.imshow(Image.open(fp))
     plt.grid(False)
     plt.xticks([])
@@ -101,12 +116,14 @@ def show_preview():
     _plot("Original",'./testbatch\\IMG_20200101_125629_1.jpg')
     plt.figure(figsize=(20,20))
     plt.subplot(2,3,1)
-    _plot("Width 200",'./testbatch\\IMG_20200101_125629_1_200.jpg')
+    _plot("Generated a lazyload blurred image, Width 200",'./testbatch\\IMG_20200101_125629_1_blur.jpg')
     plt.subplot(2,3,2)
-    _plot("Width 763",'./testbatch\\IMG_20200101_125629_1_763.jpg')
+    _plot("Width 200",'./testbatch\\IMG_20200101_125629_1_200.jpg')
     plt.subplot(2,3,3)
-    _plot("Width 1132",'./testbatch\\IMG_20200101_125629_1_1132.jpg')
+    _plot("Width 763",'./testbatch\\IMG_20200101_125629_1_763.jpg')
     plt.subplot(2,3,4)
+    _plot("Width 1132",'./testbatch\\IMG_20200101_125629_1_1132.jpg')
+    plt.subplot(2,3,5)
     _plot("Width 1400",'./testbatch\\IMG_20200101_125629_1_1400.jpg')
 
 ```
@@ -119,11 +136,11 @@ show_preview()
 ```
 
 
-![png](output_17_0.png)
+![png](output_16_0.png)
 
 
 
-![png](output_17_1.png)
+![png](output_16_1.png)
 
 
 
